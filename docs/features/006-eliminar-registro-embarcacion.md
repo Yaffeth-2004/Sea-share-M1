@@ -2,165 +2,141 @@
 
 **Created**: 2026-09-07
 
+
 ## User Scenarios & Testing _(mandatory)_
 
-### User Story 1 - Eliminar (desactivar) una embarcación propia (Priority: P1)
+### User Story 1 - Eliminar una embarcación como Propietario (Priority: P1)
 
-El Propietario elimina una de sus embarcaciones que ya fue creada. La eliminación es una **desactivación** (no un borrado definitivo de los datos): la embarcación deja de aparecer en las búsquedas y deja de poder reservarse. Esta acción es **definitiva** y no se puede deshacer ni reactivar la embarcación.
+El Propietario elimina una de las embarcaciones de su lista "Mis Embarcaciones Registradas" desde la pantalla de detalle de la embarcación. Al pulsar el botón **Eliminar**, el sistema muestra un mensaje de confirmación que advierte que la acción elimina el registro de forma permanente, libera la matrícula asociada y no se puede deshacer, con las opciones **Conservar** y **Sí, eliminar**. Para el usuario la eliminación es definitiva; internamente, el sistema conserva el registro únicamente como historial.
 
-**Why this priority**: Permite al Propietario retirar del servicio una embarcación propia de forma segura y controlada, impidiendo que se siga ofreciendo o reservando.
+**Why this priority**: Permite al Propietario retirar del servicio una embarcación de forma segura y controlada, impidiendo que se siga ofreciendo o reservando.
 
-**Independent Test**: Puede probarse eliminando una embarcación propia en estado Disponible o En Mantenimiento/Limpieza, confirmando la acción, y verificando que deja de aparecer y de poder reservarse.
+**Independent Test**: Puede probarse abriendo el detalle de una embarcación en estado Disponible o En Mantenimiento/Limpieza, pulsando Eliminar, eligiendo cada una de las opciones del mensaje y verificando el resultado.
 
 **Acceptance Scenarios**:
 
-1. **Scenario**: Eliminación confirmada de una embarcación propia
-   - **Given** el Propietario está autenticado y tiene una embarcación propia en estado Disponible o En Mantenimiento/Limpieza sin reservas activas
-   - **When** inicia la eliminación y confirma la advertencia de que la acción es definitiva e irreversible
-   - **Then** el sistema desactiva la embarcación, muestra una confirmación de éxito y lleva al Propietario a la lista de embarcaciones
+1. **Scenario**: Mensaje de confirmación al eliminar
+   - **Given** el Propietario está autenticado y se encuentra en el detalle de una embarcación en estado Disponible o En Mantenimiento/Limpieza
+   - **When** pulsa el botón Eliminar
+   - **Then** el sistema muestra el mensaje "¿Eliminar embarcación?" indicando que la acción eliminará el registro de forma permanente, liberará su matrícula asociada y no se puede deshacer, con las opciones Conservar y Sí, eliminar
 
-2. **Scenario**: Eliminación cancelada en la confirmación
-   - **Given** el Propietario inició la eliminación de una embarcación propia
-   - **When** el sistema muestra la advertencia de irreversibilidad y el Propietario elige cancelar
-   - **Then** el sistema no elimina la embarcación y permanece donde estaba, sin cambios
+2. **Scenario**: Conservar la embarcación
+   - **Given** el sistema muestra el mensaje de confirmación de eliminación
+   - **When** el Propietario elige Conservar
+   - **Then** el sistema no elimina la embarcación, cierra el mensaje y lo devuelve a la pantalla de detalle de la embarcación sin ningún cambio
 
-3. **Scenario**: Eliminación bloqueada por reservas activas
-   - **Given** el Propietario tiene una embarcación propia con reservas futuras o en curso
-   - **When** intenta eliminarla
-   - **Then** el sistema bloquea la eliminación y muestra un mensaje indicando que la embarcación tiene reservas activas y no puede eliminarse
+3. **Scenario**: Eliminación confirmada
+   - **Given** el sistema muestra el mensaje de confirmación de eliminación
+   - **When** el Propietario elige Sí, eliminar
+   - **Then** el sistema elimina la embarcación y lo lleva a la pantalla "Mis Embarcaciones Registradas" ya actualizada, sin mostrar la embarcación eliminada
 
-4. **Scenario**: Eliminación bloqueada por estado no permitido
-   - **Given** el Propietario tiene una embarcación propia en estado Reservada o En Navegación
-   - **When** intenta eliminarla
-   - **Then** el sistema bloquea la eliminación y no permite ejecutarla
+4. **Scenario**: Sin mensaje adicional tras eliminar
+   - **Given** el Propietario confirmó la eliminación con Sí, eliminar
+   - **When** el sistema completa la eliminación
+   - **Then** el mensaje de confirmación de eliminación es el único mensaje del flujo; el sistema no muestra un mensaje de éxito adicional
 
 ---
 
-### User Story 2 - Eliminar (desactivar) cualquier embarcación como Administrador (Priority: P1)
+### User Story 2 - Eliminar una embarcación como Administrador (Priority: P1)
 
-El Administrador elimina la embarcación de cualquier propietario del sistema. A diferencia del Propietario, el Administrador puede eliminar una embarcación que está Reservada, gestionando las reservas existentes. Al igual que con el Propietario, la eliminación es definitiva e irreversible, y requiere confirmación explícita.
+El Administrador elimina la embarcación de cualquier propietario del sistema desde la pantalla de detalle de la embarcación, a la que accede desde la pantalla "Control General de Flota Fluvial". El mensaje de confirmación y sus opciones son los mismos que ve el Propietario, y las reglas de estado también son las mismas.
 
-**Why this priority**: Permite al Administrador retirar del servicio embarcaciones problemáticas (por incumplimiento, seguridad o fraude del Propietario) aunque tengan reservas activas.
+**Why this priority**: Permite al Administrador retirar del servicio embarcaciones de cualquier propietario del sistema cuando sea necesario.
 
-**Independent Test**: Puede probarse eliminando, como Administrador, una embarcación de otro propietario en estado Disponible, Reservada o En Mantenimiento/Limpieza y verificando que se desactiva y deja de estar disponible.
+**Independent Test**: Puede probarse, como Administrador, abriendo el detalle de una embarcación de otro propietario en estado Disponible o En Mantenimiento/Limpieza, pulsando Eliminar y verificando el resultado de cada opción.
 
 **Acceptance Scenarios**:
 
+1. **Scenario**: Mensaje de confirmación al eliminar
+   - **Given** el Administrador está autenticado y se encuentra en el detalle de una embarcación de cualquier propietario en estado Disponible o En Mantenimiento/Limpieza
+   - **When** pulsa el botón Eliminar
+   - **Then** el sistema muestra el mismo mensaje "¿Eliminar embarcación?" con las opciones Conservar y Sí, eliminar
 
+2. **Scenario**: Conservar la embarcación
+   - **Given** el sistema muestra el mensaje de confirmación de eliminación
+   - **When** el Administrador elige Conservar
+   - **Then** el sistema no elimina la embarcación y lo devuelve a la pantalla "Control General de Flota Fluvial"
 
-1. **Scenario**: Eliminación con reservas activas por el Administrador
-   - **Given** el Administrador está autenticado y la embarcación tiene reservas activas
-   - **When** decide eliminarla (por ejemplo, por incumplimiento, seguridad o fraude del Propietario) y confirma
-   - **Then** el sistema desactiva la embarcación y se gestionan las reservas existentes (cancelación y notificación al cliente; el mecanismo exacto se define con el Módulo 2 de Reservas)
-
-2. **Scenario**: Eliminación bloqueada en estado En Navegación
-   - **Given** el Administrador intenta eliminar una embarcación en estado En Navegación
-   - **When** intenta iniciar su eliminación
-   - **Then** el sistema bloquea la eliminación por tratarse de un uso activo en tiempo real con riesgo operativo o de seguridad
-
-3. **Scenario**: Eliminación cancelada en la confirmación
-   - **Given** el Administrador inició la eliminación de una embarcación
-   - **When** el sistema muestra la advertencia de irreversibilidad y el Administrador elige cancelar
-   - **Then** el sistema no elimina la embarcación y permanece donde estaba, sin cambios
+3. **Scenario**: Eliminación confirmada
+   - **Given** el sistema muestra el mensaje de confirmación de eliminación
+   - **When** el Administrador elige Sí, eliminar
+   - **Then** el sistema elimina la embarcación y lo lleva a la pantalla "Control General de Flota Fluvial" ya actualizada, sin mostrar la embarcación eliminada
 
 ---
 
-### User Story 3 - Iniciar eliminación desde la lista o el detalle de la embarcación (Priority: P2)
+### User Story 3 - Restricción del botón Eliminar según el estado de la embarcación (Priority: P1)
 
-Tanto el Propietario como el Administrador pueden iniciar la eliminación de una embarcación desde la lista de embarcaciones o desde la pantalla de detalle de una embarcación.
+El botón **Eliminar** se encuentra en la pantalla de detalle de la embarcación. El sistema lo habilita, tanto para el Propietario como para el Administrador, únicamente cuando la embarcación está en estado **Disponible** o **En Mantenimiento/Limpieza**. Cuando la embarcación está en estado **Reservada** o **En Navegación**, el botón aparece deshabilitado y no permite iniciar la eliminación.
 
-**Why this priority**: Ofrece flexibilidad para acceder a la eliminación según el contexto en el que se esté trabajando.
+**Why this priority**: Evita eliminar una embarcación que está en uso (reservada o navegando), lo que podría afectar servicios en curso o con riesgo operativo o de seguridad.
 
-**Independent Test**: Puede probarse iniciando la eliminación tanto desde la lista de embarcaciones como desde el detalle de una embarcación, verificando que en ambos casos funciona igual.
+**Independent Test**: Puede probarse abriendo el detalle de una embarcación en cada estado (Disponible, En Mantenimiento/Limpieza, Reservada, En Navegación), con ambos actores, y verificando que el botón Eliminar solo está habilitado en Disponible y En Mantenimiento/Limpieza.
 
 **Acceptance Scenarios**:
 
-1. **Scenario**: Eliminación iniciada desde la lista (Propietario)
-   - **Given** el Propietario está en la lista de sus embarcaciones registradas
-   - **And** la embarcación seleccionada está en un estado permitido (Disponible o En Mantenimiento/Limpieza) y sin reservas activas ni futuras
-   - **When** elige la opción de eliminar una embarcación desde la lista
-   - **Then** el sistema solicita confirmación y, al confirmarse, desactiva la embarcación
+1. **Scenario**: Botón Eliminar habilitado en estado Disponible
+   - **Given** el Propietario o el Administrador está en el detalle de una embarcación en estado Disponible
+   - **When** se muestra la pantalla
+   - **Then** el botón Eliminar aparece habilitado
 
-2. **Scenario**: Eliminación iniciada desde la lista (Administrador, sin reservas activas)
-   - **Given** el Administrador está en la lista general de embarcaciones del sistema
-   - **And** la embarcación seleccionada está en un estado permitido (Disponible o En Mantenimiento/Limpieza) y sin reservas activas
-   - **When** elige la opción de eliminar una embarcación desde la lista
-   - **Then** el sistema solicita confirmación y, al confirmarse, desactiva la embarcación
+2. **Scenario**: Botón Eliminar habilitado en estado En Mantenimiento/Limpieza
+   - **Given** el Propietario o el Administrador está en el detalle de una embarcación en estado En Mantenimiento/Limpieza
+   - **When** se muestra la pantalla
+   - **Then** el botón Eliminar aparece habilitado
 
-3. **Scenario**: Eliminación iniciada desde la lista (Administrador, con reservas activas)
-   - **Given** el Administrador está en la lista general de embarcaciones del sistema
-   - **And** la embarcación seleccionada está en estado Reservada, con reservas activas
-   - **When** elige la opción de eliminar una embarcación desde la lista
-   - **Then** el sistema solicita confirmación y, al confirmarse, desactiva la embarcación
-   - **And** el sistema gestiona las reservas existentes (cancelación/notificación al cliente)
+3. **Scenario**: Botón Eliminar deshabilitado en estado Reservada
+   - **Given** el Propietario o el Administrador está en el detalle de una embarcación en estado Reservada
+   - **When** se muestra la pantalla
+   - **Then** el botón Eliminar aparece deshabilitado y no permite iniciar la eliminación
 
-4. **Scenario**: Eliminación iniciada desde el detalle (Propietario)
-   - **Given** el Propietario está en la pantalla de detalle de una de sus embarcaciones
-   - **And** la embarcación está en un estado permitido (Disponible o En Mantenimiento/Limpieza) y sin reservas activas ni futuras
-   - **When** elige la opción de eliminar desde el detalle
-   - **Then** el sistema solicita confirmación y, al confirmarse, desactiva la embarcación
-
-5. **Scenario**: Eliminación iniciada desde el detalle (Administrador, sin reservas activas)
-   - **Given** el Administrador está en la pantalla de detalle de una embarcación, al que accedió mediante "Consultar información embarcación".
-   - **And** la embarcación está en un estado permitido (Disponible o En Mantenimiento/Limpieza) y sin reservas activas
-   - **When** elige la opción de eliminar desde el detalle
-   - **Then** el sistema solicita confirmación y, al confirmarse, desactiva la embarcación
-
-6. **Scenario**: Eliminación iniciada desde el detalle (Administrador, con reservas activas)
-   - **Given** el Administrador está en la pantalla de detalle de una embarcación, al que accedió mediante "Consultar información embarcación".
-   - **And** la embarcación está en estado Reservada, con reservas activas
-   - **When** elige la opción de eliminar desde el detalle
-   - **Then** el sistema solicita confirmación y, al confirmarse, desactiva la embarcación
-   - **And** el sistema gestiona las reservas existentes (cancelación/notificación al cliente)
+4. **Scenario**: Botón Eliminar deshabilitado en estado En Navegación
+   - **Given** el Propietario o el Administrador está en el detalle de una embarcación en estado En Navegación
+   - **When** se muestra la pantalla
+   - **Then** el botón Eliminar aparece deshabilitado y no permite iniciar la eliminación
 
 ---
 
 ### Edge Cases
 
-- **Eliminación con reservas activas**: el Propietario no puede eliminar si la embarcación tiene reservas futuras o en curso (se bloquea y se muestra mensaje). El Administrador sí puede, y las reservas existentes se gestionan con el Módulo 2 de Reservas (mecanismo pendiente de definir).
-- **Eliminación en uso activo**: la eliminación en estado En Navegación está bloqueada para ambos actores por el riesgo operativo y de seguridad inmediato.
-- **Irreversibilidad**: una vez eliminada (desactivada), la embarcación no se puede reactivar ni deshacer la eliminación.
-- **Pérdida de conexión al confirmar la eliminación**: si la petición de eliminación falla (por ejemplo, por pérdida de conexión), el sistema no desactiva la embarcación, muestra un error y permite reintentar.
+- **Irreversibilidad**: una vez eliminada, la embarcación no se puede recuperar ni reactivar, y ni el Propietario ni el Administrador pueden volver a acceder a ella. El sistema conserva el registro únicamente como historial interno.
+- **Cambio de estado con el mensaje de confirmación abierto**: si el estado de la embarcación cambia a Reservada o En Navegación mientras el mensaje de confirmación está abierto, el sistema revalida el estado al pulsar Sí, eliminar. Si el estado ya no permite eliminar, rechaza la eliminación, conserva la embarcación y muestra un mensaje indicando que la embarcación cambió de estado y ya no puede eliminarse.
+- **Pérdida de conexión al confirmar la eliminación**: si la petición de eliminación falla (por ejemplo, por pérdida de conexión), el sistema no elimina la embarcación, muestra un error y permite reintentar.
 
 ## Requirements _(mandatory)_
 
 ### Functional Requirements
 
-- **FR-001**: El sistema DEBE permitir al Propietario eliminar únicamente las embarcaciones que le pertenecen
-- **FR-002**: El sistema DEBE permitir al Administrador eliminar la embarcación de cualquier propietario
-
-- **FR-003**: El sistema DEBE interpretar la eliminación como una desactivación (marcado lógico independiente del estado operativo), de modo que la embarcación deja de aparecer en las búsquedas y deja de poder reservarse, conservando sus datos en el sistema
-- **FR-004**: El sistema DEBE tratar la eliminación como definitiva e irreversible; la embarcación eliminada NO se puede reactivar
-- **FR-005**: El sistema DEBE permitir al Propietario eliminar una embarcación únicamente en estado Disponible o En Mantenimiento/Limpieza
-- **FR-006**: El sistema DEBE bloquear al Propietario la eliminación de una embarcación en estado Reservada o En Navegación
-- **FR-007**: El sistema DEBE bloquear al Propietario la eliminación de una embarcación que tenga reservas futuras o en curso, mostrando un mensaje que indique que la embarcación tiene reservas activas y no puede eliminarse
-- **FR-008**: El sistema DEBE permitir al Administrador eliminar una embarcación en estado Disponible, Reservada o En Mantenimiento/Limpieza
-- **FR-009**: El sistema DEBE bloquear al Administrador la eliminación de una embarcación en estado En Navegación, por tratarse de un uso activo en tiempo real con riesgo operativo o de seguridad
-- **FR-010**: El sistema DEBE permitir al Administrador eliminar una embarcación aunque tenga reservas activas, y gestionar esas reservas (cancelación y notificación al cliente; el mecanismo exacto se define con el Módulo 2 de Reservas)
-- **FR-011**: El sistema DEBE solicitar una confirmación explícita antes de ejecutar la eliminación
-- **FR-012**: El sistema DEBE mostrar en la confirmación una advertencia de que la eliminación es definitiva e irreversible, ofreciendo al usuario confirmar o cancelar
-- **FR-013**: El sistema DEBE no eliminar la embarcación y permanecer sin cambios si el usuario cancela la confirmación
-- **FR-014**: El sistema DEBE mostrar una confirmación de éxito al eliminar la embarcación correctamente
-- **FR-015**: El sistema DEBE llevar al usuario a la lista de embarcaciones después de eliminar correctamente una embarcación
-- **FR-016**: El sistema DEBE permitir iniciar la eliminación tanto desde la lista de embarcaciones como desde la pantalla de detalle de una embarcación
-- **FR-017**: El sistema DEBE aplicar la eliminación a embarcaciones ya creadas; la baja de embarcaciones en estado Borrador se gestiona mediante el caso de uso "Cancelar registro", no con esta funcionalidad
-
-- **FR-018**: El sistema DEBE permitir reintentar la eliminación sin cambios si la petición falla (por ejemplo, por pérdida de conexión); en ese caso no desactiva la embarcación y muestra un error
+- **FR-001**: El sistema DEBE permitir al Propietario eliminar, desde la pantalla de detalle, las embarcaciones que visualiza en su lista "Mis Embarcaciones Registradas"
+- **FR-002**: El sistema DEBE permitir al Administrador eliminar, desde la pantalla de detalle, la embarcación de cualquier propietario
+- **FR-003**: El sistema DEBE tratar la eliminación como una eliminación lógica: el registro de la embarcación se conserva en el sistema únicamente como historial, aunque para el usuario se presenta como una eliminación permanente
+- **FR-004**: El sistema DEBE tratar la eliminación como definitiva e irreversible; la embarcación eliminada NO se puede reactivar y ni el Propietario ni el Administrador pueden volver a acceder a ella
+- **FR-005**: El sistema DEBE dejar de mostrar la embarcación eliminada en "Mis Embarcaciones Registradas", en "Control General de Flota Fluvial" y en las búsquedas, dejar de permitir su reserva y liberar su matrícula asociada
+- **FR-006**: El sistema DEBE mostrar el botón Eliminar en la pantalla de detalle de la embarcación, tanto para el Propietario como para el Administrador
+- **FR-007**: El sistema DEBE habilitar el botón Eliminar únicamente cuando la embarcación está en estado Disponible o En Mantenimiento/Limpieza
+- **FR-008**: El sistema DEBE mostrar el botón Eliminar deshabilitado, sin permitir iniciar la eliminación, cuando la embarcación está en estado Reservada o En Navegación
+- **FR-009**: El sistema DEBE mostrar, al pulsar Eliminar, el mensaje de confirmación "¿Eliminar embarcación?" que indica que la acción eliminará el registro de forma permanente y liberará su matrícula asociada, advierte que la acción no se puede deshacer y ofrece las opciones Conservar y Sí, eliminar
+- **FR-010**: El sistema DEBE, al elegir Conservar, no eliminar la embarcación y cerrar el mensaje: al Propietario lo devuelve a la pantalla de detalle de la embarcación y al Administrador a la pantalla "Control General de Flota Fluvial"
+- **FR-011**: El sistema DEBE, al elegir Sí, eliminar, eliminar la embarcación y llevar al usuario a la lista actualizada sin la embarcación eliminada: al Propietario a "Mis Embarcaciones Registradas" y al Administrador a "Control General de Flota Fluvial"
+- **FR-012**: El sistema NO DEBE mostrar un mensaje de éxito adicional tras eliminar; el único mensaje del flujo es el de confirmación de eliminación
+- **FR-013**: El sistema DEBE revalidar el estado de la embarcación al pulsar Sí, eliminar y rechazar la eliminación, con un mensaje explicativo, si ya no es Disponible ni En Mantenimiento/Limpieza
+- **FR-014**: El sistema DEBE permitir reintentar la eliminación si la petición falla (por ejemplo, por pérdida de conexión); en ese caso no elimina la embarcación y muestra un error
 
 ### Key Entities
 
-- **Embarcación**: Representa una embarcación registrada. En esta funcionalidad se aplica una desactivación lógica (una marca que la retira de búsquedas y de la reserva) y definitiva. Los estados operativos posibles son: Borrador, Disponible, Reservado, En Navegación y En Mantenimiento/Limpieza.
-- **Propietario**: Usuario autenticado que posee embarcaciones y solo puede eliminar las suyas, sin reservas activas.
-- **Administrador**: Usuario autenticado con permiso para eliminar la embarcación de cualquier propietario, incluida una con reservas activas (en este caso gestionando las reservas con el Módulo 2 de Reservas).
+- **Embarcación**: Representa una embarcación registrada. En esta funcionalidad se aplica una eliminación lógica y definitiva: el registro se conserva solo como historial interno, deja de ser accesible para el Propietario y el Administrador, deja de aparecer en listas y búsquedas, y su matrícula queda liberada. Los estados operativos posibles son: Disponible, Reservado, En Navegación y En Mantenimiento/Limpieza.
+- **Propietario**: Usuario autenticado que gestiona sus embarcaciones y puede eliminar las que visualiza en su lista, cuando están en un estado que lo permite.
+- **Administrador**: Usuario autenticado con permiso para eliminar la embarcación de cualquier propietario, con las mismas reglas de estado que el Propietario.
 
 
 ## Success Criteria _(mandatory)_
 
 ### Measurable Outcomes
 
-- **SC-001**: El 100% de las eliminaciones requieren confirmación explícita con advertencia de irreversibilidad antes de ejecutarse
-
-- **SC-002**: El 100% de los intentos de eliminar una embarcación en estado En Navegación son bloqueados por el sistema, para ambos actores
-- **SC-003**: El 100% de los intentos de un Propietario de eliminar una embarcación con reservas activas son bloqueados con el mensaje correspondiente
-- **SC-004**: El 100% de las embarcaciones eliminadas (desactivadas) dejan de aparecer en las búsquedas y dejan de poder reservarse
-- **SC-005**: El 100% de las eliminaciones confirmadas llevan al usuario a la lista de embarcaciones con una confirmación de éxito
+- **SC-001**: El 100% de las eliminaciones requieren confirmación explícita, mediante un mensaje que advierte que la acción es permanente e irreversible, antes de ejecutarse
+- **SC-002**: El 100% de las embarcaciones en estado Reservada o En Navegación muestran el botón Eliminar deshabilitado, para ambos actores
+- **SC-003**: El 100% de las embarcaciones en estado Disponible o En Mantenimiento/Limpieza muestran el botón Eliminar habilitado, para ambos actores
+- **SC-004**: El 100% de las embarcaciones eliminadas dejan de aparecer en las listas y en las búsquedas, dejan de poder reservarse y liberan su matrícula
+- **SC-005**: El 100% de las eliminaciones confirmadas llevan al usuario a su lista actualizada sin la embarcación eliminada: "Mis Embarcaciones Registradas" para el Propietario y "Control General de Flota Fluvial" para el Administrador
+- **SC-006**: El 100% de las veces que el usuario elige Conservar, la embarcación permanece sin ningún cambio
+- **SC-007**: El 100% de las eliminaciones son rechazadas si el estado de la embarcación cambió a uno que no permite eliminar entre la apertura del mensaje de confirmación y su confirmación
+- **SC-008**: El 100% de las embarcaciones eliminadas conservan su registro como historial interno del sistema

@@ -1,118 +1,176 @@
 # Feature Specification: Enviar a Mantenimiento
+Created: 2026-09-07
+Updated: 2026-09-29
 
-**Created:** 07/09/2026
+## User Scenarios & Testing *(mandatory)*
 
-## User Scenarios & Testing
+### User Story 1 - Propietario envía su embarcación a mantenimiento (Priority: P1)
 
-### User Story 1 - Propietario envía embarcación a mantenimiento/limpieza rutinario (Priority: P1)
+Desde la ficha de una embarcación Disponible, el propietario pulsa "Enviar a Mantenimiento" y confirma. La embarcación pasa a "En Mantenimiento" y deja de recibir reservas.
 
-El Propietario puede enviar su embarcación a mantenimiento después de finalizar un alquiler, para realizar limpieza, revisión o adecuación antes de volver a ponerla disponible. Esta acción es inmediata, sin necesidad de proporcionar información adicional, y el estado de la embarcación cambia automáticamente de estado En navegacion a Mantenimiento.
+**Why this priority**: Permite al propietario retirar su embarcación del servicio para limpieza, revisión o adecuación.
 
-**Why this priority:** Es la funcionalidad principal y más frecuente del sistema. Sin ella, el Propietario no podría gestionar el mantenimiento rutinario de sus embarcaciones después de cada alquiler.
+**Independent Test**: Con una embarcación Disponible, enviarla a mantenimiento como propietario y verificar que el estado cambia a "En Mantenimiento" en la ficha y en el listado.
 
-**Independent Test:** Puede ser probada independientemente enviando una embarcación a mantenimiento desde la cuenta del Propietario y verificando que el estado cambie a Mantenimiento y que la embarcación deje de estar disponible para nuevos alquileres.
+**Acceptance Scenarios**:
 
-**Acceptance Scenarios:**
+1. **Scenario**: Abrir la confirmación
+   - **Given** el propietario está en la ficha de una embarcación en estado Disponible
+   - **When** pulsa "Enviar a Mantenimiento"
+   - **Then** el sistema muestra el modal "¿Enviar a Mantenimiento?" con el texto "La embarcación no recibirá reservas temporalmente." y los botones "Cancelar" y "Sí, enviar"
 
-1. **Scenario:** Propietario envía embarcación a mantenimiento al finalizar un alquiler
-   - **Given** que el Propietario tiene una embarcación con estado "En Navegación" cuyo alquiler acaba de finalizar
-   - **When** el Propietario hace clic en "Enviar a mantenimiento"
-   - **Then** el estado de la embarcación cambia inmediatamente de "En Navegación" a "Mantenimiento", la embarcación deja de estar disponible para nuevos alquileres, y no se envía ninguna notificación.
+2. **Scenario**: Confirmar el envío
+   - **Given** se muestra el modal "¿Enviar a Mantenimiento?" del propietario
+   - **When** pulsa "Sí, enviar"
+   - **Then** el sistema cambia el estado de la embarcación a "En Mantenimiento", registra que el propietario inició el mantenimiento y notifica al administrador
 
-### User Story 2 - Administrador envía embarcación a mantenimiento con motivo (Priority: P1)
+3. **Scenario**: Cancelar el envío
+   - **Given** se muestra el modal "¿Enviar a Mantenimiento?" del propietario
+   - **When** pulsa "Cancelar"
+   - **Then** el modal se cierra y la embarcación conserva el estado Disponible
 
-El Administrador puede enviar una embarcación a mantenimiento cuando detecta una situación que requiere atención. Al hacerlo, debe indicar el motivo por el cual la embarcación debe ser retirada del servicio. El Propietario recibe una notificación con el motivo y puede consultarlo en la información de la embarcación.
+---
 
-**Why this priority:** Es una funcionalidad esencial para la gestión operativa. El Administrador necesita controlar el estado de las embarcaciones cuando existen problemas que el Propietario no ha identificado o no ha reportado.
+### User Story 2 - Administrador envía una embarcación a mantenimiento con motivo (Priority: P1)
 
-**Independent Test:** Puede ser probada enviando una embarcación a mantenimiento desde la cuenta del Administrador, verificando que el estado cambie, que el Propietario reciba la notificación con el motivo, y que el motivo quede visible en la información de la embarcación.
+Desde la ficha de una embarcación Disponible, el administrador pulsa "Enviar a Mantenimiento", escribe el motivo y confirma. La embarcación pasa a "En Mantenimiento" y el propietario recibe una notificación cuyo motivo puede consultar.
 
-**Acceptance Scenarios:**
+**Why this priority**: Permite al administrador retirar del servicio una embarcación con un problema que el propietario no ha reportado.
 
-1. **Scenario:** Administrador envía embarcación a mantenimiento
-   - **Given** que existe una embarcación con estado "Disponible"
-   - **When** el Administrador envía la embarcación a mantenimiento indicando un motivo
-   - **Then** el estado de la embarcación cambia a "Mantenimiento", la embarcación deja de estar disponible para nuevos alquileres, y el Propietario recibe una notificación con el motivo indicado.
+**Independent Test**: Como administrador, enviar una embarcación Disponible a mantenimiento con un motivo y verificar el cambio de estado y la notificación al propietario.
 
-### User Story 3 - Administrador pone embarcación a Disponible después de mantenimiento (Priority: P2)
+**Acceptance Scenarios**:
 
-Después de que el Administrador envía una embarcación a mantenimiento, solo él puede devolverla a estado Disponible una vez que el problema haya sido resuelto por el Propietario. No existe un límite de tiempo para permanecer en estado Mantenimiento cuando el Administrador inicia la acción.
+1. **Scenario**: Abrir la confirmación
+   - **Given** el administrador está en la ficha de una embarcación en estado Disponible
+   - **When** pulsa "Enviar a Mantenimiento"
+   - **Then** el sistema muestra el modal "¿Enviar a Mantenimiento?" con el texto "La embarcación no recibirá reservas temporalmente. Se enviará una notificación al propietario.", el campo "Motivo del mantenimiento" (placeholder "Describe la razón del mantenimiento (ej. revisión de motor...)") y los botones "Cancelar" y "Sí, enviar"
 
-**Why this priority:** Es la contraparte de la funcionalidad de envío por parte del Administrador. Sin ella, las embarcaciones enviadas a mantenimiento por el Administrador no podrían volver al servicio.
+2. **Scenario**: Confirmar con motivo
+   - **Given** el administrador escribió un motivo en el modal
+   - **When** pulsa "Sí, enviar"
+   - **Then** el sistema cambia el estado a "En Mantenimiento", registra que el administrador inició el mantenimiento, guarda el motivo y notifica al propietario
 
-**Independent Test:** Puede ser probada verificando que el Administrador pueda cambiar el estado de Mantenimiento a Disponible, y que el Propietario no pueda realizar esta acción cuando el mantenimiento fue iniciado por el Administrador.
+3. **Scenario**: Motivo vacío
+   - **Given** el modal está abierto y el campo "Motivo del mantenimiento" está vacío
+   - **When** el administrador pulsa "Sí, enviar"
+   - **Then** el sistema resalta el campo y no envía la embarcación a mantenimiento
 
-**Acceptance Scenarios:**
+4. **Scenario**: Cancelar el envío
+   - **Given** se muestra el modal del administrador
+   - **When** pulsa "Cancelar"
+   - **Then** el modal se cierra, no se guarda el motivo y la embarcación conserva el estado Disponible
 
-1. **Scenario:** Administrador pone embarcación a Disponible
-   - **Given** que una embarcación está en estado "Mantenimiento" porque el Administrador la envió
-   - **When** el Administrador cambia el estado a "Disponible"
-   - **Then** el estado de la embarcación cambia a "Disponible" y vuelve a estar disponible para nuevos alquileres.
+---
 
-2. **Scenario:** Propietario no puede cambiar estado de mantenimiento iniciado por Administrador
-   - **Given** que una embarcación está en estado "Mantenimiento" porque el Administrador la envió
-   - **When** el Propietario revisa la información de la embarcación
-   - **Then** no visualiza la opción de poner la embarcación a Disponible.
+### User Story 3 - Propietario consulta la notificación del administrador (Priority: P1)
 
-### User Story 4 - Propietario pone embarcación a Disponible después de mantenimiento rutinario (Priority: P2)
+El propietario ve la notificación en la campana y consulta el motivo registrado por el administrador.
 
-Cuando el Propietario envía su embarcación a mantenimiento rutinario (después de un alquiler), él mismo puede devolverla a estado Disponible una vez que haya terminado la limpieza, revisión o adecuación. Esta acción se realiza con un botón llamado "Poner a Disponibilidad".
+**Why this priority**: Es la única vía por la que el propietario conoce el motivo del mantenimiento.
 
-**Why this priority:** Permite que el Propietario gestione de forma autónoma el ciclo de mantenimiento rutinario de sus embarcaciones, sin depender del Administrador.
+**Independent Test**: Tras un envío del administrador, ingresar como propietario y verificar la campana, el desplegable y el modal con el motivo.
 
-**Independent Test:** Puede ser probada verificando que el Propietario pueda cambiar el estado de Mantenimiento a Disponible haciendo clic en "Poner a Disponibilidad", y que la embarcación vuelva a estar disponible para alquileres.
+**Acceptance Scenarios**:
 
-**Acceptance Scenarios:**
+1. **Scenario**: Notificación recibida
+   - **Given** el administrador envió una embarcación del propietario a mantenimiento
+   - **When** el propietario ingresa al sistema
+   - **Then** la campana muestra un contador rojo con el número de notificaciones nuevas y el listado muestra la embarcación como "En Mantenimiento"
 
-1. **Scenario:** Propietario pone embarcación a Disponible después de mantenimiento rutinario
-   - **Given** que una embarcación está en estado "Mantenimiento" porque el Propietario la envió
-   - **When** el Propietario hace clic en "Poner a Disponibilidad"
-   - **Then** el estado de la embarcación cambia a "Disponible" y vuelve a estar disponible para nuevos alquileres.
+2. **Scenario**: Abrir la campana
+   - **Given** el propietario tiene notificaciones nuevas
+   - **When** pulsa la campana
+   - **Then** el sistema despliega "Notificaciones del Sistema" con la etiqueta "1 NUEVA" (según el número), el nombre de la embarcación, el texto "El administrador ha enviado una notificación sobre el estado de la embarcación." y el botón "Revisar completamente"
 
-2. **Scenario:** Propietario visualiza botón de disponibilidad solo para mantenimiento propio
-   - **Given** que una embarcación está en estado "Mantenimiento"
-   - **When** el Propietario revisa la información de la embarcación
-   - **Then** visualiza el botón "Poner a Disponibilidad" solo si el mantenimiento fue iniciado por él; si fue iniciado por el Administrador, no visualiza este botón.
+3. **Scenario**: Revisar la notificación
+   - **Given** el desplegable está abierto
+   - **When** el propietario pulsa "Revisar completamente"
+   - **Then** el sistema muestra el modal "Detalle de Notificación" con el subtítulo "Aviso enviado por el Administrador General", la embarcación afectada con su estado, y el motivo bajo "Motivo registrado por administración"
 
-## Edge Cases
+4. **Scenario**: Cerrar el detalle
+   - **Given** se muestra el modal "Detalle de Notificación"
+   - **When** el propietario pulsa "Entendido y cerrar" o la X
+   - **Then** el modal se cierra y la notificación se marca como leída, reduciendo el contador de la campana
 
-- ¿Qué ocurre si el Administrador envía a mantenimiento una embarcación que tiene reservas activas del Propietario? → El sistema muestra una alerta y notifica al Propietario de las reservas afectadas.
+---
 
-- ¿Qué ocurre si el Propietario intenta poner a Disponible una embarcación que el Administrador envió a mantenimiento? → El sistema no permite la acción y muestra un mensaje indicando que solo el Administrador puede realizar este cambio.
+### User Story 4 - Administrador consulta la notificación del propietario (Priority: P2)
 
-## Requirements
+El administrador ve en su campana la notificación generada cuando un propietario envía su embarcación a mantenimiento.
+
+**Why this priority**: Mantiene informado al administrador de los cambios de estado de la flota.
+
+**Independent Test**: Tras un envío del propietario, ingresar como administrador y verificar la campana y el acceso al detalle de la embarcación.
+
+**Acceptance Scenarios**:
+
+1. **Scenario**: Notificación recibida y desplegada
+   - **Given** un propietario envió una embarcación a mantenimiento
+   - **When** el administrador pulsa la campana, que muestra un contador rojo
+   - **Then** el sistema despliega "Notificaciones Administrativas" con la etiqueta "1 NUEVA" (según el número), el nombre de la embarcación, el texto "El propietario ha solicitado la revisión de la embarcación." y el botón "Ver detalles"
+
+2. **Scenario**: Ver detalles
+   - **Given** el desplegable está abierto
+   - **When** el administrador pulsa "Ver detalles"
+   - **Then** el sistema muestra la ficha de esa embarcación
+
+---
+
+### User Story 5 - Terminar el mantenimiento (Priority: P2)
+
+Desde la ficha de una embarcación En Mantenimiento, quien inició el mantenimiento pulsa "Terminar mantenimiento" y la embarcación vuelve a Disponible.
+
+**Why this priority**: Sin esta acción, las embarcaciones enviadas a mantenimiento no volverían al servicio.
+
+**Independent Test**: Terminar el mantenimiento como propietario (si él lo inició) y como administrador (si él lo inició) y verificar que la embarcación vuelve a Disponible.
+
+**Acceptance Scenarios**:
+
+1. **Scenario**: Propietario termina su mantenimiento
+   - **Given** la embarcación está En Mantenimiento por envío del propietario
+   - **When** el propietario pulsa "Terminar mantenimiento" en la ficha
+   - **Then** la embarcación pasa a Disponible y puede recibir reservas
+
+2. **Scenario**: Administrador termina su mantenimiento
+   - **Given** la embarcación está En Mantenimiento por envío del administrador
+   - **When** el administrador pulsa "Terminar mantenimiento" en la ficha
+   - **Then** la embarcación pasa a Disponible y puede recibir reservas
+
+---
+
+## Requirements *(mandatory)*
 
 ### Functional Requirements
 
-- **FR-001:** El sistema DEBE permitir al Propietario enviar una embarcación a mantenimiento haciendo clic en "Enviar a mantenimiento".
-- **FR-002:** El sistema DEBE cambiar el estado de la embarcación de "En Navegación" (tras finalizar el alquiler) a "Mantenimiento" inmediatamente cuando el Propietario realiza la acción.
-- **FR-003:** El sistema DEBE impedir que la embarcación esté disponible para nuevos alquileres mientras esté en estado "Mantenimiento".
-- **FR-004:** El sistema DEBE permitir al Administrador enviar una embarcación a mantenimiento indicando un motivo.
-- **FR-005:** El sistema DEBE enviar una notificación al Propietario con el motivo cuando el Administrador envía la embarcación a mantenimiento.
-- **FR-006:** El sistema DEBE mostrar el motivo del mantenimiento en la información de la embarcación cuando fue iniciado por el Administrador.
-- **FR-007:** El sistema DEBE permitir al Propietario cambiar el estado de "Mantenimiento" a "Disponible" usando el botón "Poner a Disponibilidad" solo cuando el mantenimiento fue iniciado por él.
-- **FR-008:** El sistema DEBE permitir al Administrador cambiar el estado de "Mantenimiento" a "Disponible" cuando el mantenimiento fue iniciado por él.
-- **FR-009:** El sistema DEBE impedir que el Propietario cambie a "Disponible" una embarcación que fue enviada a mantenimiento por el Administrador.
-- **FR-010:** El sistema DEBE mostrar una alerta cuando el Propietario envía a mantenimiento una embarcación con reservas activas.
-- **FR-011:** El sistema DEBE mantener al Propietario como propietario de la embarcación durante el estado "Mantenimiento"; el Propietario no pierde acceso ni se desvincula de ella.
-- **FR-012:** El sistema DEBE permitir al Propietario ver que su embarcación está en estado "Mantenimiento".
-- **FR-013:** El sistema DEBE mostrar una alerta cuando el Administrador envía a mantenimiento una embarcación con reservas activas del Propietario.
+**Envío**
+- **FR-001**: El sistema DEBE mostrar el botón "Enviar a Mantenimiento" en la ficha de una embarcación en estado Disponible, al propietario de la embarcación y al administrador
+- **FR-002**: El sistema DEBE mostrar, al pulsarlo, el modal "¿Enviar a Mantenimiento?" con "Cancelar" y "Sí, enviar"; para el propietario con el texto "La embarcación no recibirá reservas temporalmente." y para el administrador con el texto "La embarcación no recibirá reservas temporalmente. Se enviará una notificación al propietario." más el campo "Motivo del mantenimiento"
+- **FR-003**: El sistema DEBE exigir el motivo cuando el envío lo hace el administrador y no permitir enviar con el campo vacío
+- **FR-004**: El sistema DEBE, al confirmar con "Sí, enviar", cambiar el estado de la embarcación de Disponible a "En Mantenimiento" y registrar quién inició el mantenimiento (propietario o administrador)
+- **FR-005**: El sistema NO DEBE permitir nuevas reservas sobre una embarcación "En Mantenimiento"
+
+**Notificaciones**
+- **FR-006**: El sistema DEBE notificar al propietario cuando el administrador envía su embarcación a mantenimiento, mostrando en la campana un contador rojo de notificaciones nuevas
+- **FR-007**: El sistema DEBE mostrar en la campana del propietario el desplegable "Notificaciones del Sistema" con la etiqueta de nuevas ("N NUEVA/S"), el nombre de la embarcación, el texto "El administrador ha enviado una notificación sobre el estado de la embarcación." y el botón "Revisar completamente"
+- **FR-008**: El sistema DEBE mostrar, al pulsar "Revisar completamente", el modal "Detalle de Notificación" con el subtítulo "Aviso enviado por el Administrador General", la embarcación afectada con su estado y el motivo bajo "Motivo registrado por administración"
+- **FR-009**: El sistema DEBE marcar la notificación como leída y reducir el contador al pulsar "Entendido y cerrar" o la X del modal
+- **FR-010**: El sistema DEBE notificar al administrador cuando un propietario envía su embarcación a mantenimiento y mostrar en su campana el desplegable "Notificaciones Administrativas" con la etiqueta de nuevas, el nombre de la embarcación, el texto "El propietario ha solicitado la revisión de la embarcación." y el botón "Ver detalles", que lleva a la ficha de la embarcación
+- **FR-011**: El sistema DEBE mostrar el motivo del mantenimiento únicamente en el modal "Detalle de Notificación"
+
+**Terminar mantenimiento**
+- **FR-012**: El sistema DEBE mostrar el botón "Terminar mantenimiento" en la ficha de una embarcación "En Mantenimiento" solo a quien inició el mantenimiento
+- **FR-013**: El sistema DEBE, al pulsar "Terminar mantenimiento", cambiar el estado a Disponible sin modal de confirmación
+- **FR-014**: El sistema NO DEBE mostrar "Terminar mantenimiento" al propietario cuando el mantenimiento lo inició el administrador
 
 ### Key Entities
 
-- **Embarcación:** Representa la unidad de alquiler. Tiene un estado que puede ser "Disponible", "En Navegación" o "Mantenimiento". El mantenimiento rutinario (Historia 1) se origina típicamente al finalizar un alquiler, es decir, desde el estado "En Navegación". Pertenece a un Propietario y puede tener reservas asociadas.
-- **Propietario:** Persona que posee la embarcación. Puede enviar su embarcación a mantenimiento rutinario y ponerla a Disponible después.
-- **Administrador:** Persona con permisos para enviar embarcaciones a mantenimiento con motivo y para ponerlas a Disponible después.
+- **Embarcación**: Estados en esta funcionalidad: Disponible ↔ En Mantenimiento. Atributos adicionales: quién inició el mantenimiento (propietario o administrador) y motivo (solo si lo inició el administrador).
+- **Notificación**: Aviso dirigido al propietario o al administrador. Atributos: embarcación, texto, motivo (solo la dirigida al propietario), leída o no leída.
 
-## Success Criteria
+## Success Criteria *(mandatory)*
 
 ### Measurable Outcomes
 
-- **SC-001:** El Propietario puede enviar una embarcación a mantenimiento en menos de 5 segundos haciendo clic en un botón.
-- **SC-002:** El estado de la embarcación cambia inmediatamente a "Mantenimiento" después de la acción del Propietario.
-- **SC-003:** El 100% de las embarcaciones en estado "Mantenimiento" aparecen como no disponibles para nuevos alquileres.
-- **SC-004:** El Propietario recibe la notificación con el motivo en el momento en que el Administrador envía la embarcación a mantenimiento.
-- **SC-005:** El Propietario puede ver el motivo del mantenimiento en la información de la embarcación el 100% de las veces que fue enviado por el Administrador.
-- **SC-006:** El 100% de las embarcaciones enviadas a mantenimiento por el Propietario pueden ser puestas a Disponible por el Propietario usando el botón "Poner a Disponibilidad".
-- **SC-007:** El 0% de las embarcaciones enviadas a mantenimiento por el Administrador pueden ser puestas a Disponible por el Propietario.
-- **SC-008:** El Propietario puede consultar el estado de su embarcación y ver si está en "Mantenimiento" en todo momento.
+- **SC-001**: El 100% de las embarcaciones "En Mantenimiento" quedan sin recibir reservas nuevas
+- **SC-002**: Solo quien inició el mantenimiento puede terminarlo
