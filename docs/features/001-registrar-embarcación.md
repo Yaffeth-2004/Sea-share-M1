@@ -1,164 +1,236 @@
 # Feature Specification: Registrar Embarcación
 Created: 2026-09-05
+Updated: 2026-09-29
 
 ## User Scenarios & Testing *(mandatory)*
 
-### User Story 1 - Registrar información básica de la embarcación (Priority: P1)
+### User Story 1 - Registrar datos básicos (Paso 1 de 2) (Priority: P1)
 
-El propietario ingresa al sistema y completa un formulario con los datos básicos de su embarcación: nombre, matrícula legal, tipo y capacidad máxima de pasajeros. Al enviar el formulario, la embarcación queda guardada en el sistema en estado Borrador, hasta que se complete el resto de la información (puerto de atraque, tarifa y foto).
+El propietario pulsa "Registrar Nueva Embarcación" en el listado "Mis Embarcaciones Registradas" y completa el Paso 1 "Datos Básicos": nombre, matrícula legal, tipo y capacidad máxima de pasajeros. Al pulsar "Siguiente", la embarcación se guarda en estado Borrador y el sistema avanza al Paso 2.
 
-**Why this priority**: Es el primer paso del registro sin el cual no se puede continuar con el resto de la información.
+**Why this priority**: Es el primer paso del registro; sin él no se puede continuar.
 
-**Independent Test**: Puede probarse ingresando los datos básicos y verificando que la embarcación queda guardada en estado Borrador.
+**Independent Test**: Completar el Paso 1 con datos válidos y verificar que la embarcación queda guardada en estado Borrador y se muestra el Paso 2.
 
 **Acceptance Scenarios**:
 
-1. **Scenario**: Datos básicos registrados correctamente
-   - **Given** el propietario está autenticado en el sistema
-   - **When** completa el formulario con nombre, matrícula válida (formato CP-NN-NNNN-X), tipo (Velero/Lancha/Yate/Catamarán) y capacidad de pasajeros
-   - **Then** la embarcación se guarda en estado Borrador, asociada a ese propietario, y puede continuar agregando más información
+1. **Scenario**: Datos básicos válidos
+   - **Given** el propietario está autenticado, no tiene un Borrador y está en el Paso 1
+   - **When** completa nombre, matrícula con formato CP-NN-NNNN-X, tipo y capacidad válida, y pulsa "Siguiente"
+   - **Then** el sistema guarda la embarcación en estado Borrador asociada a ese propietario, marca con ✓ "Datos Básicos" en el indicador de pasos y muestra el Paso 2
 
 2. **Scenario**: Matrícula con formato inválido
-   - **Given** el propietario está en el formulario de registro
-   - **When** ingresa una matrícula que no sigue el formato CP-NN-NNNN-X
-   - **Then** el sistema muestra un error con el formato correcto
+   - **Given** el propietario está en el Paso 1
+   - **When** ingresa una matrícula que no sigue el formato CP-NN-NNNN-X y pulsa "Siguiente"
+   - **Then** el sistema muestra un error con el formato correcto y no avanza
 
 3. **Scenario**: Campos obligatorios vacíos
-   - **Given** el propietario está en el formulario de registro
-   - **When** intenta guardar sin completar todos los campos
-   - **Then** el sistema resalta qué campos faltan y no permite guardar
+   - **Given** el propietario está en el Paso 1
+   - **When** pulsa "Siguiente" con algún campo vacío
+   - **Then** el sistema resalta los campos faltantes y no avanza
 
-4. **Scenario**: Matrícula ya registrada por otro propietario
-   - **Given** el propietario está en el formulario de registro
-   - **When** ingresa una matrícula que ya existe en el sistema
-   - **Then** el sistema muestra un error indicando que la matrícula ya está registrada y no permite guardar
+4. **Scenario**: Matrícula ya registrada
+   - **Given** el propietario está en el Paso 1
+   - **When** ingresa una matrícula que ya existe en el sistema y pulsa "Siguiente"
+   - **Then** el sistema muestra un error indicando que la matrícula ya está registrada y no avanza
 
-5. **Scenario**: Capacidad de pasajeros excede el máximo según el tipo de embarcación
-   - **Given** el propietario está en el formulario de registro
-   - **When** ingresa una capacidad de pasajeros mayor al máximo permitido para el tipo seleccionado (Lancha: 12, Velero: 15, Catamarán: 30, Yate: 40)
-   - **Then** el sistema muestra un error indicando el máximo permitido para ese tipo de embarcación
+5. **Scenario**: Capacidad excede el máximo del tipo
+   - **Given** el propietario está en el Paso 1
+   - **When** ingresa una capacidad mayor al máximo del tipo seleccionado (Lancha: 12, Velero: 15, Catamarán: 30, Yate: 40)
+   - **Then** el sistema muestra un error indicando el máximo permitido para ese tipo y no avanza
 
-6. **Scenario**: Servicios base incluidos automáticamente
-   - **Given** el propietario registra una nueva embarcación
-   - **When** el sistema crea el registro
-   - **Then** Capitán y Combustible quedan incluidos automáticamente, sin que el propietario deba seleccionarlos
-
-7. **Scenario**: Borrador vencido se elimina automáticamente
-   - **Given** una embarcación en estado Borrador que superó los 10 días desde su creación sin completar la información restante
-   - **When** el sistema verifica los borradores pendientes
-   - **Then** el registro se elimina completamente y la matrícula queda disponible para un nuevo registro
+6. **Scenario**: Cancelar en el Paso 1
+   - **Given** el propietario está en el Paso 1
+   - **When** pulsa "Cancelar"
+   - **Then** el comportamiento es el definido en la especificación "Cancelar Registro"
 
 ---
 
-### User Story 2 - Completar información de puerto, tarifa, servicios y foto (Priority: P1)
+### User Story 2 - Completar puerto, tarifa, servicios y foto (Paso 2 de 2) (Priority: P1)
 
-Después de guardar los datos básicos, el propietario busca el puerto de atraque en un mapa interactivo y coloca una etiqueta en la ubicación correspondiente (el sistema extrae automáticamente la latitud y longitud), define la tarifa base de alquiler, selecciona los servicios adicionales incluidos sin costo extra, y sube una foto de la embarcación. Cuando toda esta información está completa, la embarcación pasa de estado Borrador a Disponible.
+En el Paso 2 "Datos Complementarios", el propietario coloca una etiqueta en el mapa para definir el puerto de atraque, ingresa la tarifa base por hora en COP, selecciona servicios adicionales (opcional) y adjunta la fotografía oficial. Al pulsar "Guardar Registro", la embarcación pasa de Borrador a Disponible.
 
-**Why this priority**: Sin esta información la embarcación no puede ofrecerse a los clientes ni ubicarse ni cotizarse.
+**Why this priority**: Sin esta información la embarcación no puede ubicarse, cotizarse ni ofrecerse.
 
-**Independent Test**: Puede probarse completando esta información sobre una embarcación con el registro inicializado (en estado Borrador) y verificando que pasa de Borrador a Disponible.
+**Independent Test**: Sobre una embarcación en Borrador, completar el Paso 2 y verificar que pasa a Disponible y aparece en el listado.
 
 **Acceptance Scenarios**:
 
-1. **Scenario**: Ubicación del puerto seleccionada en el mapa
-   - **Given** el propietario está en el segundo paso del registro
-   - **When** busca el nombre del puerto en el mapa y coloca una etiqueta en la ubicación correspondiente
-   - **Then** el sistema extrae y guarda automáticamente la latitud y longitud de esa ubicación y las asocia como puerto de atraque de esa embarcación
+1. **Scenario**: Puerto seleccionado en el mapa
+   - **Given** el propietario está en el Paso 2
+   - **When** coloca una etiqueta en el mapa
+   - **Then** el sistema obtiene el nombre del puerto, la latitud y la longitud de ese punto y los muestra en una etiqueta con el texto "Nombre — Lat: X° N, Long: Y° W (Seleccionado)"
 
-2. **Scenario**: Puerto no encontrado en la búsqueda
-   - **Given** el propietario está buscando el puerto en el mapa
-   - **When** el nombre buscado no arroja resultados
-   - **Then** el sistema permite colocar la etiqueta manualmente en el mapa y extraer las coordenadas de ese punto
+2. **Scenario**: Cambiar la ubicación seleccionada
+   - **Given** ya hay una etiqueta colocada en el mapa
+   - **When** el propietario coloca la etiqueta en otro punto
+   - **Then** el sistema reemplaza la ubicación anterior por la nueva y actualiza nombre, latitud y longitud
 
-3. **Scenario**: Tarifa base definida
-   - **Given** el propietario está en el segundo paso del registro
-   - **When** ingresa un valor de tarifa base
-   - **Then** el sistema guarda la tarifa asociada a la embarcación
+3. **Scenario**: Servicios base
+   - **Given** el propietario está en el Paso 2
+   - **When** visualiza la sección "Servicios base obligatorios (incluidos)"
+   - **Then** Capitán y Combustible aparecen como elementos no editables con el texto "Estos servicios vienen predeterminados y no se pueden remover", y quedan asociados a la embarcación aunque no seleccione servicios adicionales
 
-4. **Scenario**: Tarifa inválida
-   - **Given** el propietario está en el segundo paso del registro
-   - **When** ingresa una tarifa negativa o un valor no numérico
-   - **Then** el sistema muestra un error indicando que la tarifa debe ser un valor numérico positivo
+4. **Scenario**: Servicios adicionales
+   - **Given** el propietario está en el Paso 2
+   - **When** marca cero o más servicios adicionales (Chalecos salvavidas, Nevera con hielo, Equipo de sonido, Equipo de pesca, Equipo de buceo)
+   - **Then** los servicios marcados quedan asociados a la embarcación además de los base
 
-5. **Scenario**: Selección de servicios adicionales
-   - **Given** el propietario está en el segundo paso del registro
-   - **When** selecciona uno o más servicios adicionales que su embarcación realmente tiene (Chalecos salvavidas, Equipo de pesca, Equipo de sonido, Nevera con hielo, Equipo de buceo)
-   - **Then** esos servicios quedan asociados a la embarcación, además de los servicios base
+5. **Scenario**: Tarifa inválida
+   - **Given** el propietario está en el Paso 2
+   - **When** ingresa una tarifa no numérica, cero o negativa y pulsa "Guardar Registro"
+   - **Then** el sistema muestra un error indicando que la tarifa debe ser un valor numérico positivo y no guarda
 
-6. **Scenario**: Ningún servicio adicional seleccionado
-   - **Given** el propietario está en el segundo paso del registro
-   - **When** no selecciona ningún servicio adicional
-   - **Then** el sistema permite continuar; la embarcación queda únicamente con los servicios base (Capitán y Combustible)
+6. **Scenario**: Foto con formato no permitido
+   - **Given** el propietario está adjuntando la fotografía
+   - **When** selecciona un archivo que no es JPG ni PNG
+   - **Then** el sistema muestra un error indicando los formatos aceptados y no adjunta el archivo
 
-7. **Scenario**: Foto con formato no permitido
-   - **Given** el propietario está subiendo la fotografía
-   - **When** intenta subir un archivo que no es JPG o PNG
-   - **Then** el sistema muestra un error indicando los formatos aceptados
+7. **Scenario**: Foto excede el tamaño máximo
+   - **Given** el propietario está adjuntando la fotografía
+   - **When** selecciona una imagen mayor a 10 MB
+   - **Then** el sistema muestra un error indicando el tamaño máximo permitido y no adjunta el archivo
 
-8. **Scenario**: Foto excede el tamaño máximo
-   - **Given** el propietario está subiendo la fotografía
-   - **When** la imagen supera los 5 MB
-   - **Then** el sistema muestra un error indicando el tamaño máximo permitido
+8. **Scenario**: Campos obligatorios incompletos
+   - **Given** el propietario está en el Paso 2
+   - **When** pulsa "Guardar Registro" sin puerto seleccionado, sin tarifa o sin foto
+   - **Then** el sistema resalta lo faltante y no guarda
 
-9. **Scenario**: Embarcación pasa de Borrador a Disponible
-   - **Given** el propietario completó datos básicos, puerto de atraque, tarifa y foto sobre su embarcación en estado Borrador
-   - **When** guarda esa información
-   - **Then** el sistema cambia el estado de la embarcación de Borrador a Disponible
+9. **Scenario**: Registro completado
+   - **Given** el propietario completó puerto, tarifa y foto en el Paso 2
+   - **When** pulsa "Guardar Registro"
+   - **Then** el sistema guarda puerto, tarifa, servicios y foto, cambia el estado de Borrador a Disponible y muestra el modal "¡Embarcación registrada!" con el texto "El nuevo vehículo fluvial ha sido registrado con éxito y se encuentra disponible en tu flota."
+
+10. **Scenario**: Aceptar confirmación
+    - **Given** se muestra el modal "¡Embarcación registrada!"
+    - **When** el propietario pulsa "Aceptar"
+    - **Then** el sistema vuelve al listado "Mis Embarcaciones Registradas", donde la embarcación aparece como Disponible con la etiqueta "NUEVA"
+
+11. **Scenario**: Cancelar en el Paso 2
+    - **Given** el propietario está en el Paso 2
+    - **When** pulsa "Cancelar"
+    - **Then** el sistema muestra dos opciones: "Continuar registro" (permanece en el Paso 2 con lo ya ingresado) y "Salir" (vuelve al listado y conserva el Borrador)
 
 ---
 
-### Edge Cases
+### User Story 3 - Listado y gestión del Borrador (Priority: P1)
 
-- **Pérdida de conexión durante el envío de un paso**: el sistema no guarda datos parciales de ese envío; si falla, se muestra un error y el propietario puede reintentar sin perder lo ya escrito en el formulario.
-- **Solicitudes simultáneas con la misma matrícula (condición de carrera)**: la unicidad de la matrícula se garantiza a nivel de base de datos; si dos registros llegan casi al mismo tiempo, el segundo falla con el mismo mensaje de matrícula duplicada.
-- **Registro en Borrador abandonado**: se mantiene guardado por un plazo máximo de 10 días desde su creación; si se cumple el plazo sin completar la información, el borrador se elimina automáticamente y su matrícula queda libre para un nuevo registro.
-- **Nombre de embarcación duplicado**: se permite; el nombre no es un identificador único, solo la matrícula lo es.
+El propietario ve sus embarcaciones registradas en "Mis Embarcaciones Registradas". Si intenta registrar una nueva teniendo un Borrador pendiente, el sistema le permite continuarlo o reemplazarlo.
+
+**Why this priority**: Define el punto de entrada al registro y evita perder o duplicar borradores.
+
+**Independent Test**: Con un Borrador existente, pulsar "Registrar Nueva Embarcación" y verificar los dos caminos (continuar o reemplazar).
+
+**Acceptance Scenarios**:
+
+1. **Scenario**: Listado con embarcaciones
+   - **Given** el propietario tiene al menos una embarcación en estado distinto de Borrador
+   - **When** ingresa a "Mis Embarcaciones Registradas"
+   - **Then** el sistema muestra una tabla con las columnas Nombre de la embarcación, Matrícula, Tipo, Estado operativo y Acciones (botón "Ver Detalles"), y el botón "Registrar Nueva Embarcación"
+
+2. **Scenario**: Listado sin embarcaciones
+   - **Given** el propietario no tiene embarcaciones registradas
+   - **When** ingresa al listado
+   - **Then** el sistema muestra el mensaje "Sin embarcaciones registradas" y el botón "Registrar Nueva Embarcación"
+
+3. **Scenario**: Etiqueta "NUEVA"
+   - **Given** el propietario tiene varias embarcaciones registradas
+   - **When** visualiza el listado
+   - **Then** solo la embarcación cuyo registro se completó más recientemente muestra la etiqueta "NUEVA"; al completarse otro registro, la etiqueta pasa a la nueva embarcación y desaparece de la anterior
+
+4. **Scenario**: Registrar sin Borrador existente
+   - **Given** el propietario no tiene un Borrador
+   - **When** pulsa "Registrar Nueva Embarcación"
+   - **Then** el sistema muestra el Paso 1 vacío
+
+5. **Scenario**: Borrador detectado
+   - **Given** el propietario tiene un Borrador
+   - **When** pulsa "Registrar Nueva Embarcación"
+   - **Then** el sistema muestra el modal "Borrador detectado" con el texto "Tienes un registro incompleto guardado bajo el nombre:", el nombre del Borrador y las opciones "Empezar un registro nuevo", "Continuar registro pendiente" y cerrar (X)
+
+6. **Scenario**: Continuar registro pendiente
+   - **Given** se muestra el modal "Borrador detectado"
+   - **When** el propietario pulsa "Continuar registro pendiente"
+   - **Then** el sistema muestra el Paso 2 del Borrador
+
+7. **Scenario**: Cerrar el modal
+   - **Given** se muestra el modal "Borrador detectado"
+   - **When** el propietario pulsa la X
+   - **Then** el modal se cierra, el Borrador se conserva y el propietario permanece en el listado
+
+8. **Scenario**: Empezar un registro nuevo
+   - **Given** se muestra el modal "Borrador detectado"
+   - **When** el propietario pulsa "Empezar un registro nuevo"
+   - **Then** el sistema muestra el modal "¿Iniciar nuevo registro?" con el texto "Si inicias un formulario nuevo, el borrador actual se eliminará de forma permanente y no podrás recuperar la información diligenciada." y las opciones "Regresar" y "Sí, eliminar y empezar"
+
+9. **Scenario**: Confirmar reemplazo del Borrador
+   - **Given** se muestra el modal "¿Iniciar nuevo registro?"
+   - **When** el propietario pulsa "Sí, eliminar y empezar"
+   - **Then** el sistema elimina el Borrador de forma permanente, libera su matrícula y muestra el Paso 1 vacío
+
+10. **Scenario**: Regresar desde la confirmación
+    - **Given** se muestra el modal "¿Iniciar nuevo registro?"
+    - **When** el propietario pulsa "Regresar"
+    - **Then** el sistema vuelve al modal "Borrador detectado" sin eliminar nada
+
+---
 
 ## Requirements *(mandatory)*
 
 ### Functional Requirements
 
-- **FR-001**: El sistema DEBE mostrar un formulario con los campos: nombre, matrícula legal, tipo de embarcación y capacidad máxima de pasajeros
-- **FR-002**: El sistema DEBE validar que la matrícula legal tenga el formato CP-NN-NNNN-X donde CP es la sigla de Capitanía de Puerto, NN el número de capitanía (00-99), NNNN el número consecutivo (0000-9999) y X una letra mayúscula
-- **FR-003**: El sistema DEBE ofrecer como opciones de tipo de embarcación: Velero, Lancha, Yate, Catamarán
-- **FR-004**: El sistema DEBE validar que la capacidad máxima de pasajeros sea un número entero mayor a 0 y no exceda el máximo definido según el tipo de embarcación: Lancha ≤12, Velero ≤15, Catamarán ≤30, Yate ≤40
-- **FR-005**: El sistema DEBE permitir buscar el puerto de atraque mediante un mapa interactivo y colocar una etiqueta en la ubicación seleccionada
-- **FR-006**: El sistema DEBE extraer y guardar automáticamente la latitud y longitud a partir de la etiqueta colocada en el mapa
-- **FR-007**: El sistema DEBE permitir colocar la etiqueta manualmente en el mapa cuando la búsqueda del nombre del puerto no arroje resultados
-- **FR-008**: El sistema DEBE permitir ingresar una tarifa base de alquiler, definida libremente por el propietario
-- **FR-009**: El sistema DEBE validar que la tarifa base sea un valor numérico positivo
-- **FR-010**: El sistema DEBE asociar automáticamente Capitán y Combustible como servicios base incluidos en toda embarcación registrada, sin que el propietario deba seleccionarlos
-- **FR-011**: El sistema DEBE permitir seleccionar servicios adicionales, sin costo extra para el arrendatario, de una lista: Chalecos salvavidas, Equipo de pesca, Equipo de sonido, Nevera con hielo, Equipo de buceo
-- **FR-012**: El sistema DEBE permitir guardar la embarcación sin que se haya seleccionado ningún servicio adicional (los servicios adicionales son opcionales; los servicios base siempre están presentes)
-- **FR-013**: El sistema DEBE permitir subir una fotografía de la embarcación en formato JPG o PNG con tamaño máximo de 5 MB
-- **FR-014**: El sistema DEBE crear toda embarcación en estado Borrador al guardar los datos básicos por primera vez
-- **FR-015**: El sistema DEBE guardar la embarcación con la información disponible en cada paso, sin exigir que esté completa desde el primer envío
-- **FR-016**: El sistema DEBE cambiar el estado de la embarcación de Borrador a Disponible únicamente cuando estén completos: datos básicos, puerto de atraque, tarifa y foto (los servicios base ya están incluidos automáticamente; los adicionales son opcionales)
-- **FR-017**: El sistema DEBE validar que los campos obligatorios de cada paso estén completos antes de permitir guardar ese paso
-- **FR-018**: El sistema DEBE confirmar el registro exitoso de cada paso mostrando un mensaje al propietario
-- **FR-019**: El sistema DEBE almacenar la fecha y hora de la creación inicial del registro
-- **FR-020**: El sistema DEBE rechazar el registro de una matrícula que ya exista en el sistema, incluyendo solicitudes simultáneas (garantizado mediante restricción de unicidad a nivel de base de datos), mostrando un mensaje específico al propietario
-- **FR-021**: El sistema NO DEBE exigir que el nombre de la embarcación sea único entre distintos propietarios
-- **FR-022**: El sistema NO DEBE guardar datos parciales si la petición de envío de un paso falla (ej. pérdida de conexión), permitiendo al propietario reintentar sin perder lo ya ingresado en el formulario
-- **FR-023**: El sistema DEBE permitir al propietario listar y retomar sus registros que estén en estado Borrador en cualquier momento, dentro del plazo de los 10 días posteriores a su creación
-- **FR-024**: El sistema DEBE asociar automáticamente la embarcación registrada al propietario autenticado que realiza el registro
-- **FR-025**: El sistema DEBE eliminar automáticamente todo registro en estado Borrador que supere los 10 días desde su creación sin haberse completado
-- **FR-026**: El sistema DEBE liberar de forma automática la matrícula asociada a un borrador eliminado para permitir su reutilización en nuevos registros
+**Listado y punto de entrada**
+- **FR-001**: El sistema DEBE mostrar en "Mis Embarcaciones Registradas" solo las embarcaciones del propietario autenticado que no estén en estado Borrador, con las columnas Nombre de la embarcación, Matrícula, Tipo, Estado operativo y Acciones ("Ver Detalles")
+- **FR-002**: El sistema DEBE mostrar "Sin embarcaciones registradas" cuando el propietario no tenga embarcaciones fuera de estado Borrador
+- **FR-003**: El sistema DEBE mostrar la etiqueta "NUEVA" únicamente en la embarcación cuyo registro se completó más recientemente, retirándola de la anterior cuando otra embarcación complete su registro
+- **FR-004**: El sistema DEBE permitir un único Borrador por propietario
+
+**Paso 1 - Datos Básicos**
+- **FR-005**: El sistema DEBE mostrar el Paso 1 con los campos: nombre de la embarcación, matrícula legal, tipo de embarcación y capacidad máxima (pasajeros), y un indicador de pasos "1 Datos Básicos — 2 Datos Complementarios"
+- **FR-006**: El sistema DEBE validar que la matrícula tenga el formato CP-NN-NNNN-X, donde CP es la sigla fija de Capitanía de Puerto, NN el número de capitanía (00-99), NNNN el consecutivo (0000-9999) y X una letra mayúscula
+- **FR-007**: El sistema DEBE ofrecer como tipos de embarcación: Velero, Lancha, Yate, Catamarán
+- **FR-008**: El sistema DEBE validar que la capacidad sea un entero mayor a 0 y no exceda el máximo del tipo: Lancha ≤12, Velero ≤15, Catamarán ≤30, Yate ≤40
+- **FR-009**: El sistema DEBE validar que los cuatro campos del Paso 1 estén completos antes de permitir "Siguiente"
+- **FR-010**: El sistema DEBE, al pulsar "Siguiente" con datos válidos, guardar la embarcación en estado Borrador asociada al propietario autenticado, registrar la fecha y hora de creación y mostrar el Paso 2 con "Datos Básicos" marcado con ✓
+- **FR-011**: El sistema DEBE rechazar una matrícula ya existente, incluso en solicitudes simultáneas (restricción de unicidad a nivel de base de datos), con un mensaje específico de matrícula ya registrada
+- **FR-012**: El sistema NO DEBE exigir que el nombre de la embarcación sea único
+
+**Paso 2 - Datos Complementarios**
+- **FR-013**: El sistema DEBE mostrar un mapa interactivo, sin barra de búsqueda, donde el propietario coloca una etiqueta para definir el puerto de atraque
+- **FR-014**: El sistema DEBE obtener y guardar el nombre del puerto, la latitud y la longitud del punto donde se colocó la etiqueta, y mostrarlos en la etiqueta con el estado "Seleccionado"
+- **FR-015**: El sistema DEBE permitir reubicar la etiqueta, conservando siempre una única ubicación
+- **FR-016**: El sistema DEBE permitir ingresar la tarifa base por hora en COP, sin mínimo ni máximo, y validar que sea un valor numérico mayor a 0
+- **FR-017**: El sistema DEBE asociar Capitán y Combustible como servicios base a toda embarcación, mostrarlos como elementos no editables y no permitir removerlos
+- **FR-018**: El sistema DEBE permitir seleccionar de forma opcional servicios adicionales, sin costo extra para el arrendatario: Chalecos salvavidas, Nevera con hielo, Equipo de sonido, Equipo de pesca, Equipo de buceo
+- **FR-019**: El sistema DEBE permitir adjuntar una fotografía JPG o PNG de hasta 10 MB
+- **FR-020**: El sistema DEBE validar que puerto, tarifa y foto estén completos antes de permitir "Guardar Registro"
+- **FR-021**: El sistema DEBE, al pulsar "Guardar Registro" con datos válidos, guardar puerto, tarifa, servicios y foto en una sola operación y cambiar el estado de Borrador a Disponible
+- **FR-022**: El sistema DEBE mostrar tras el guardado el modal "¡Embarcación registrada!" con el botón "Aceptar", que devuelve al listado
+- **FR-023**: El sistema DEBE mostrar, al pulsar "Cancelar" en el Paso 2, las opciones "Continuar registro" y "Salir"; "Salir" vuelve al listado conservando el Borrador
+- **FR-024**: El sistema NO DEBE ofrecer botón "Atrás" en el Paso 2
+- **FR-025**: El comportamiento de "Cancelar" en el Paso 1 DEBE ser el definido en la especificación "Cancelar Registro"
+
+**Borrador**
+- **FR-026**: El sistema DEBE mostrar el modal "Borrador detectado" al pulsar "Registrar Nueva Embarcación" cuando exista un Borrador, con el nombre del Borrador y las opciones "Continuar registro pendiente", "Empezar un registro nuevo" y cerrar (X)
+- **FR-027**: El sistema DEBE llevar al Paso 2 al elegir "Continuar registro pendiente"
+- **FR-028**: El sistema DEBE mostrar el modal "¿Iniciar nuevo registro?" al elegir "Empezar un registro nuevo"; "Sí, eliminar y empezar" elimina el Borrador de forma permanente, libera su matrícula y muestra el Paso 1 vacío; "Regresar" vuelve al modal "Borrador detectado"
+- **FR-029**: El sistema DEBE eliminar automáticamente todo Borrador que supere 10 días desde su creación y liberar su matrícula
+- **FR-030**: El sistema DEBE cambiar una embarcación de Borrador a Disponible únicamente cuando estén completos datos básicos, puerto de atraque, tarifa y foto
+
+**Errores de envío**
+- **FR-031**: El sistema NO DEBE guardar datos parciales si falla el envío de un paso (por ejemplo, pérdida de conexión); DEBE mostrar un error y conservar lo ingresado en el formulario para reintentar
 
 ### Key Entities
 
-- **Embarcación**: Representa una embarcación registrada. Atributos: nombre, matrícula legal (única), tipo, capacidad máxima de pasajeros, tarifa base, fecha de registro, estado. Pertenece a un único propietario (quien la registró). Ciclo de vida del estado: Borrador (recién creada, información incompleta) → Disponible (información completa, ofrecida para alquiler) → Reservado → En Navegación → En Mantenimiento/Limpieza (pudiendo volver a Disponible).
-- **Puerto de Atraque**: Ubicación geográfica de la embarcación, obtenida mediante selección en un mapa interactivo. Atributos: nombre del puerto, latitud, longitud
-- **Servicio**: Inclusiones sin costo adicional para el arrendatario, cubiertas dentro del precio del alquiler. Se dividen en dos categorías: base (Capitán, Combustible), asignados automáticamente a toda embarcación; y adicionales (Chalecos salvavidas, Equipo de pesca, Equipo de sonido, Nevera con hielo, Equipo de buceo), que el propietario selecciona solo si su embarcación efectivamente los tiene
-- **Propietario**: Usuario que registra la embarcación (el registro de su cuenta se define en otra especificación). Relación: un propietario puede registrar múltiples embarcaciones
+- **Embarcación**: Atributos: nombre, matrícula legal (única), tipo, capacidad máxima de pasajeros, tarifa base por hora (COP), fotografía, fecha de creación, fecha de finalización del registro, estado. Pertenece a un único propietario. Estados en esta funcionalidad: Borrador → Disponible.
+- **Puerto de Atraque**: Ubicación de la embarcación, obtenida al colocar una etiqueta en el mapa. Atributos: nombre del puerto, latitud, longitud.
+- **Servicio**: Inclusión sin costo adicional para el arrendatario. Base (Capitán, Combustible): asignados automáticamente y no removibles. Adicionales (Chalecos salvavidas, Nevera con hielo, Equipo de sonido, Equipo de pesca, Equipo de buceo): seleccionados de forma opcional por el propietario.
+- **Propietario**: Usuario autenticado que registra la embarcación (su cuenta se define en otra especificación). Puede registrar múltiples embarcaciones, pero tener un solo Borrador a la vez.
 
 ## Success Criteria *(mandatory)*
 
 ### Measurable Outcomes
 
-- **SC-001**: El propietario puede completar el registro de una embarcación (todos los pasos) en menos de 3 minutos
-- **SC-002**: El 100% de las matrículas registradas cumplen con el formato CP-NN-NNNN-X y son únicas en el sistema
-- **SC-003**: Las fotografías subidas son válidas (formato y tamaño correcto) en el 95% de los intentos
-- **SC-004**: No se permiten registros con campos obligatorios vacíos
-- **SC-005**: La embarcación solo pasa de Borrador a Disponible cuando tiene toda la información obligatoria completa
-- **SC-006**: El 100% de las embarcaciones en estado Borrador que superan el límite de 10 días sin completarse se eliminan automáticamente y liberan su matrícula
+- **SC-001**: El propietario puede completar el registro de una embarcación (Paso 1 y Paso 2) en menos de 3 minutos
+- **SC-002**: El 100% de las matrículas registradas cumplen el formato CP-NN-NNNN-X y son únicas en el sistema
+- **SC-003**: Una embarcación solo pasa de Borrador a Disponible cuando tiene datos básicos, puerto de atraque, tarifa y foto completos
